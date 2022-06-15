@@ -1,23 +1,22 @@
-const redisClient = require('../utils/redis');
-const dbClient = require('../utils/db');
+import RedisClient from '../utils/redis';
+import DBClient from '../utils/db';
 
-/** getStatus - callback for route GET /status
- returns json data if both Redis and mongoDB clients are connected
- */
-function getStatus(req, res) {
-  if (redisClient.isAlive() && dbClient.isAlive()) {
-    res.status(200).json({ redis: true, db: true });
+class AppController {
+  static getStatus(req, res) {
+    const data = {
+      redis: RedisClient.isAlive(),
+      db: DBClient.isAlive(),
+    };
+    return res.status(200).send(data);
+  }
+
+  static async getStats(req, res) {
+    const data = {
+      users: await DBClient.nbUsers(),
+      files: await DBClient.nbFiles(),
+    };
+    return res.status(200).send(data);
   }
 }
 
-/** getStats - callback for route GET /stats
- uses functions from the db client to return number of users
- and files.
- */
-async function getStats(req, res) {
-  const userNum = await dbClient.nbUsers();
-  const fileNum = await dbClient.nbFiles();
-  res.status(200).json({ users: userNum, files: fileNum });
-}
-
-module.exports = { getStats, getStatus };
+module.exports = AppController;
