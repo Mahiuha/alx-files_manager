@@ -1,12 +1,21 @@
-import router from './routes/index';
-
 const express = require('express');
+const bodyParser = require('body-parser');
+const router = require('./routes/index');
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-router(app);
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-app.listen(port, () => {
-  console.log(`Listening at http://localhost:${port}`);
-});
+app.use('/', router);
+app.use('/status', router);
+app.use('/stats', router);
+app.use('/users', router);
+app.use('/connect', router);
+app.use('/disconnect', router);
+app.use('/files', router);
+
+app.listen(port);
+
+module.exports = app;
